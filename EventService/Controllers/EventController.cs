@@ -11,15 +11,12 @@ namespace EventService.Controllers
     public class EventController : ControllerBase
     {
         public record OrderList(long Id, DateTimeOffset Time, int Table, int Pizza);
-
         private static long currentId = 0;
         private static readonly IList<OrderList> Database = new List<OrderList>();
 
         [HttpPost]
         public void RaiseEvent(Event e)
         {
-
-            // Event order = e;
             var id = Interlocked.Increment(ref currentId);
             Database.Add(
               new OrderList(
