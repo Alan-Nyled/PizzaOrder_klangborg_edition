@@ -1,6 +1,7 @@
 ﻿using EventService.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Reflection.Metadata.Ecma335;
 
 namespace EventService.Controllers
@@ -9,27 +10,35 @@ namespace EventService.Controllers
     [ApiController]
     public class EventController : ControllerBase
     {
-        /// <summary>
-        /// Kaldes af en anden service, når den har brug for at offentliggøre (publishe) et event
-        /// </summary>
-        /// <param name="e">Information om den event, der er opstået</param>
+        public record OrderList(long Id, DateTimeOffset Time, int Table, int Pizza);
+
+        private static long currentId = 0;
+        private static readonly IList<OrderList> Database = new List<OrderList>();
+
         [HttpPost]
-        public void RaiseEvent(Event e) {
-            /// TODO: Skriv din kode her - husk også at implementere event-klassen
+        public void RaiseEvent(Event e)
+        {
+
+            // Event order = e;
+            var id = Interlocked.Increment(ref currentId);
+            Database.Add(
+              new OrderList(
+                id,
+                DateTimeOffset.UtcNow,
+                e.Table,
+                e.Pizza));
+            Console.WriteLine($"***** Bord {e.Table} har bestilt pizza nr.: {e.Pizza} *****\n");
         }
 
-        /// <summary>
-        /// Henter events
-        /// </summary>
-        /// <param name="startIndex">Index på det første event der skal hentes</param>
-        /// <param name="antal">Antallet af events der maksimalt skal hentes (der kan være færre)</param>
-        /// <returns></returns>
         [HttpGet]
-        public List<Event> ListEvents(int startIndex, int antal)
-        {
-            // TODO Skriv din kode her. Du må gerne ændre returtype og parametre, hvis du vil. Koden her er bare tænkt som et udgangspunkt.
-
-            return new();
+        public OrderList[] ListEvents([FromQuery] long start = 0, [FromQuery] long end = Int32.MaxValue)
+        {           
+             return Database
+               .Where(e =>
+                 e.Id >= start &&
+                 e.Id <= end)
+               .OrderBy(e => e.Id)
+               .ToArray();
         }
     }
 }
