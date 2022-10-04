@@ -6,7 +6,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace EventService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class EventController : ControllerBase
     {
@@ -14,7 +14,7 @@ namespace EventService.Controllers
         private static long currentId = 0;
         private static readonly IList<OrderList> Database = new List<OrderList>();
 
-        [HttpPost]
+        [HttpPost("/newOrder")]
         public void RaiseEvent(Event e)
         {
             var id = Interlocked.Increment(ref currentId);
@@ -27,7 +27,7 @@ namespace EventService.Controllers
             Console.WriteLine($"***** Bord {e.Table} har bestilt pizza nr.: {e.Pizza} *****\n");
         }
 
-        [HttpGet]
+        [HttpGet("/listOrders")]
         public OrderList[] ListEvents([FromQuery] long start = 0, [FromQuery] long end = Int32.MaxValue)
         {           
              return Database
