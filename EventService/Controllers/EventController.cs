@@ -39,3 +39,6 @@ namespace EventService.Controllers
         }
     }
 }
+// Ikke muligt at bruge Int64 MaxValue i Swagger. Det er vist begrænset af Javascript Max Int
+// Derfor Int32.MaxValue
+// Men det er også mange Pizzaer... 1 pizza i sekundet indtil år 2038 !
